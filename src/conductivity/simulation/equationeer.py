@@ -10,15 +10,18 @@ class Equationeer(object):
     '''
     Operates with equations of the model
     '''
-    
-    def lsystem_to_matrix(self, equations, vars_list):
+    def lsystem_to_matrix_and_ordinate(self, equations, vars_list):
         B = []
+        b = [0 for _ in range(len(vars_list))]
+             
         for i in range(len(equations)):
-            B.append([]) 
+            b[i] = -equations[i].as_independent(*vars_list)[0]            
+            B.append([])
+             
             for j in range(len(vars_list)):
                 B[i].append(equations[i].coeff(vars_list[j]))
                 
-        return sympy.Matrix(B)
+        return sympy.Matrix(B), b
     
     def node_equations(self, grid):
         for node in grid.nodes[:-1]:

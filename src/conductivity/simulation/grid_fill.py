@@ -8,7 +8,7 @@ from conductivity.basic_elements.grid import Grid
 from conductivity.basic_elements.wire import Wire
 from conductivity.basic_elements.node import Node
 from conductivity.simulation.equationeer import Equationeer as eq
-import sys, sympy 
+import sys, sympy, numpy
 import random as rnd
 
     
@@ -73,22 +73,26 @@ def execute(N, P, verbose=False, silent = False):
         if N<15:
             grid.draw()
          
-    equations = list(eq().circuit_equations(grid))
-    if verbose: print(equations)
+    equations1 = list(eq().circuit_equations(grid))
+    if verbose: print(equations1)
        
-    equations+= list(eq().node_equations(grid))
-    if verbose: print(equations)
-         
-    solution = sympy.solve(equations)#, grid.wires[7].current)
-    if verbose: print(solution)
-     
+    equations2 = list(eq().node_equations(grid))
+    if verbose: print(equations2)
+    
+    equations = equations1+equations2
+    
+    eq_matrix, ordinate = eq().lsystem_to_matrix_and_ordinate(equations, currents)
+          
+    solution = numpy.linalg.solve(eq_matrix, ordinate)
+    solution = dict(zip(currents, solution))
+    if verbose and N<15: print(solution)
+      
     if not silent:   
         print('The sum of currents is: ', sum(solution.values()))
-     
+       
     return [grid.wires, solution, currents, sum(solution.values())]
-     
     
     
 if __name__ == '__main__':
     
-    execute(int(sys.argv[1]), float(sys.argv[2]), True)
+    execute(int(sys.argv[1]), float(sys.argv[2]), False)

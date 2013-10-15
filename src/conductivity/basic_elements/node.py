@@ -19,5 +19,5 @@ class Node(object):
     def __repr__(self):
         return str(self.id)
     
-    def draw(self):
-        print("+", end='')
+    def draw(self): 
+        print('+', end="")
