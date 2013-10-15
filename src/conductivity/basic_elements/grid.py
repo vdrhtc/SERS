@@ -53,4 +53,27 @@ class Grid(object):
         else:
             return wires[1], wires[0]
     
-    
+    def neighborhood_nodes(self, node):
+        """
+        Ugly generator that decides whether we should go round the thor 
+        to reach the neighborhood node
+        """
+        grid = self
+        N = int(math.sqrt(len(self.nodes)))
+        if (node.id+1) % N == 0:
+            # Checking if the node is on the right edge
+            yield grid.nodes[node.id+1-N] 
+            try:
+                yield grid.nodes[node.id + N]
+            except IndexError:
+                #Index error appears only when we go from the bottom to top
+                yield grid.nodes[node.id - N**2 + N]
+        else:      
+            yield grid.nodes[node.id + 1]
+            try:
+                yield grid.nodes[node.id + N]
+            except IndexError:
+                #Index error appears only when we go from the bottom to top
+                yield grid.nodes[node.id - N**2 + N]
+         
+     
