@@ -7,6 +7,7 @@ Created on 09 окт. 2013 г.
 from conductivity.basic_elements.grid import Grid
 from conductivity.basic_elements.wire import Wire
 from conductivity.basic_elements.node import Node
+from conductivity.simulation.equationeer import Equationeer as eq
 import sys, sympy 
 import random as rnd
 
@@ -72,11 +73,11 @@ def execute(N, P, verbose=False, silent = False):
         if N<15:
             grid.draw()
          
-    equations = list(grid.circuit_equations())
-    equations+= list(grid.node_equations())
-    if verbose:
-        print(list(grid.node_equations()))
-        print(list(grid.circuit_equations()))
+    equations = list(eq().circuit_equations(grid))
+    if verbose: print(equations)
+       
+    equations+= list(eq().node_equations(grid))
+    if verbose: print(equations)
          
     solution = sympy.solve(equations)#, grid.wires[7].current)
     if verbose: print(solution)

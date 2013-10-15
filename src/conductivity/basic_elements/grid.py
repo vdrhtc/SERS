@@ -53,39 +53,4 @@ class Grid(object):
         else:
             return wires[1], wires[0]
     
-    def node_equations(self):
-        for node in self.nodes[:-1]:
-            yield (self.get_wires_to_node(node)[0].current
-                  +self.get_wires_to_node(node)[1].current
-                  -self.get_wires_from_node(node)[0].current
-                  -self.get_wires_from_node(node)[1].current)
     
-    def circuit_equations(self):
-        """Yeilds circuit equations counter watch"""
-        for node in self.nodes[:-1]:
-            first_wire = self.get_wires_from_node(node)[1]
-            second_node = first_wire.node_to
-            second_wire = self.get_wires_from_node(second_node)[0]
-            third_node = second_wire.node_to
-            third_wire = self.get_wires_to_node(third_node)[1]
-            fourth_wire = self.get_wires_from_node(node)[0] 
-            yield (first_wire.current/first_wire.conductivity
-                   + second_wire.current/second_wire.conductivity
-                   - third_wire.current/third_wire.conductivity
-                   - fourth_wire.current/fourth_wire.conductivity)
-        eq_vertical = 0
-        N = int(math.sqrt(len(self.nodes)))
-        node_iter = self.nodes[0]
-        for _ in range(0, N):
-            wire_iter = self.get_wires_from_node(node_iter)[1]
-            eq_vertical += wire_iter.current/wire_iter.conductivity-wire_iter.emf
-            node_iter = wire_iter.node_to
-        yield eq_vertical
-        
-        eq_horizontal = 0
-        node_iter = self.nodes[0]
-        for _ in range(0, N):
-            wire_iter = self.get_wires_from_node(node_iter)[0]
-            eq_horizontal += wire_iter.current/wire_iter.conductivity-wire_iter.emf
-            node_iter = wire_iter.node_to
-        yield eq_horizontal
