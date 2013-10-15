@@ -11,12 +11,23 @@ from conductivity.simulation.equationeer import Equationeer as eq
 import sys, sympy, numpy
 import random as rnd
 
-    
-    
-def execute(N, P, verbose=False, silent = False):
+
+def solve(equations, variables, eq_matrix, ordinate, symbolic=False):
     """
-    Fills the grid, builds equations to calculate currents and solves them
-    returns a grid representation in wires, solution dictionary, keys, sum of currents
+    Solves symbolically or numerically given equations
+    """
+    if not symbolic:
+        solution = numpy.linalg.solve(eq_matrix, ordinate) 
+        solution = dict(zip(variables, solution))
+        return [solution, variables, sum(solution.values())]
+    else:
+        solution = sympy.solve(equations)
+        return [solution, variables, sum(solution.values())]
+    
+def execute_fill(N, P, verbose=False, silent = False):
+    """
+    Fills the grid, builds equations to calculate currents and 
+    returns the grid, symbolic equations, variables and the numerical representation of the equations
     """
     grid = Grid()
     
@@ -82,17 +93,10 @@ def execute(N, P, verbose=False, silent = False):
     equations = equations1+equations2
     
     eq_matrix, ordinate = eq().lsystem_to_matrix_and_ordinate(equations, currents)
-          
-    solution = numpy.linalg.solve(eq_matrix, ordinate)
-    solution = dict(zip(currents, solution))
-    if verbose and N<15: print(solution)
-      
-    if not silent:   
-        print('The sum of currents is: ', sum(solution.values()))
-       
-    return [grid.wires, solution, currents, sum(solution.values())]
-    
+        
+    return grid, equations, currents, eq_matrix, ordinate
+        
     
 if __name__ == '__main__':
-    
-    execute(int(sys.argv[1]), float(sys.argv[2]), False)
+    grid, equations, currents, eq_matrix, ordinate = execute_fill(int(sys.argv[1]), float(sys.argv[2]), False)
+    print("The sum of currents is: ", (solve(equations, currents, eq_matrix, ordinate, False))[-1])
