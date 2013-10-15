@@ -13,12 +13,16 @@ import random as rnd
     
     
 def execute(N, P, verbose=False, silent = False):
-    """Fills the grid and builds equations to calculate currents"""
+    """
+    Fills the grid, builds equations to calculate currents and solves them
+    returns a grid representation in wires, solution dictionary, keys, sum of currents
+    """
     grid = Grid()
     
     currents_gen = sympy.numbered_symbols('I')
-    
-    
+    currents = [next(currents_gen) for _ in range(0,2*N**2)]
+    currents_iter = iter(currents)
+
     def choose_conductivity():
         """Uses given probability to simulate different concentrations of metallic particles"""
         return 1 if rnd.random() < P else 1e-5
@@ -47,38 +51,41 @@ def execute(N, P, verbose=False, silent = False):
             except IndexError:
                 #Index error appears only when we go from the bottom to top
                 yield grid.nodes[node.id - N**2 + N]
-        
-        
+     
+     
     grid.nodes = [Node(number_id) for number_id in range(0, N ** 2)]
     
     grid.wires = [Wire(choose_conductivity(),
                        choose_emf(node_from, node_to), 
                        node_from, 
                        node_to,
-                       next(currents_gen))
+                       next(currents_iter))
                        for node_from in grid.nodes
                        for node_to in neighborhood_nodes(node_from)]
-#     for wire in grid.wires:
-#         print(wire)
+     
+    if verbose:
+        for wire in grid.wires:
+            print(wire)
+             
     if not silent:    
         print(len(grid.wires))
         if N<15:
             grid.draw()
-        
+         
     equations = list(grid.circuit_equations())
     equations+= list(grid.node_equations())
-    if verbose == True:
+    if verbose:
         print(list(grid.node_equations()))
         print(list(grid.circuit_equations()))
-        
+         
     solution = sympy.solve(equations)#, grid.wires[7].current)
-    if verbose == True: print(solution)
-    
+    if verbose: print(solution)
+     
     if not silent:   
         print('The sum of currents is: ', sum(solution.values()))
-    
-    return [grid.wires, solution, sum(solution.values())]
-    
+     
+    return [grid.wires, solution, currents, sum(solution.values())]
+     
     
     
 if __name__ == '__main__':
