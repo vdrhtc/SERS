@@ -24,7 +24,7 @@ def solve(equations, variables, eq_matrix, ordinate, symbolic=False):
         solution = sympy.solve(equations)
         return [solution, variables, sum(solution.values())]
     
-def execute_fill(matrix_dimension, P, verbose=False, silent = False, fast = True):
+def execute_fill(matrix_dimension, P, verbose=False, silent = False, fast = True, sm = 1, sd = 1e-5):
     """
     Fills the grid, builds equations to calculate currents and 
     returns the grid, symbolic equations, variables and the numerical representation of the equations
@@ -35,9 +35,9 @@ def execute_fill(matrix_dimension, P, verbose=False, silent = False, fast = True
     currents = [next(currents_gen) for _ in range(0,2*matrix_dimension**2)]
     currents_iter = iter(currents)
 
-    def choose_conductivity():
+    def choose_conductivity(sm, sd):
         """Uses given probability to simulate different concentrations of metallic particles"""
-        return 4 if rnd.random() < P else 1
+        return sm if rnd.random() < P else sd
     
     def choose_emf(node_from, node_to):
         """Places a battery only in vertical wires"""
@@ -46,7 +46,7 @@ def execute_fill(matrix_dimension, P, verbose=False, silent = False, fast = True
    
     grid.nodes = [Node(number_id) for number_id in range(0, matrix_dimension ** 2)]
     
-    grid.wires = [Wire(choose_conductivity(),
+    grid.wires = [Wire(choose_conductivity(sm, sd),
                        choose_emf(node_from, node_to), 
                        node_from, 
                        node_to,
