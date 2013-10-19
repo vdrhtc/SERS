@@ -24,7 +24,7 @@ def solve(equations, variables, eq_matrix, ordinate, symbolic=False):
         solution = sympy.solve(equations)
         return [solution, variables, sum(solution.values())]
     
-def execute_fill(matrix_dimension, P, verbose=False, silent = False):
+def execute_fill(matrix_dimension, P, verbose=False, silent = False, fast = True):
     """
     Fills the grid, builds equations to calculate currents and 
     returns the grid, symbolic equations, variables and the numerical representation of the equations
@@ -62,20 +62,23 @@ def execute_fill(matrix_dimension, P, verbose=False, silent = False):
         print(len(grid.wires))
         if matrix_dimension<15:
             grid.draw()
-         
-    equations1 = list(eq().circuit_equations(grid))
-    if verbose: print(equations1)
-       
-    equations2 = list(eq().node_equations(grid))
-    if verbose: print(equations2)
-    
-    equations = equations1+equations2
-    
-    eq_matrix, ordinate = eq().lsystem_to_matrix_and_ordinate(equations, currents)
+     
+    if not fast:    
+        equations1 = list(eq().circuit_equations(grid))
+        if verbose: print(equations1)
         
+        equations2 = list(eq().node_equations(grid))
+        if verbose: print(equations2)
+        
+        equations = equations1+equations2
+    
+        eq_matrix, ordinate = eq().lsystem_to_matrix_and_ordinate(equations, currents)
+    else:
+        eq_matrix, ordinate = eq().create_equation_matrix_and_ordinate(currents, grid)
+        equations = None
     return grid, equations, currents, eq_matrix, ordinate
         
     
 if __name__ == '__main__':
-    grid, equations, currents, eq_matrix, ordinate = execute_fill(int(sys.argv[1]), float(sys.argv[2]), False)
+    grid, equations, currents, eq_matrix, ordinate = execute_fill(int(sys.argv[1]), float(sys.argv[2]), False, fast=True)
     print("The sum of currents is: ", (solve(equations, currents, eq_matrix, ordinate, False))[-1])

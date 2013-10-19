@@ -4,12 +4,22 @@ Created on 15 окт. 2013 г.
 @author: vdrhtc
 '''
 import unittest, sympy
+from sympy import Matrix
 from conductivity.simulation.equationeer import Equationeer
+from conductivity.simulation.grid_fill_and_solve import execute_fill
 
 
 class Test(unittest.TestCase):
 
-
+    def test_create_equation_matrix_and_ordinate(self):
+        '''Should make a corresponding matrix from grid'''
+        grid, equations, currents, eq_matrix, ordinate = execute_fill(2, 0.8, silent=True)
+        B, b = Equationeer().create_equation_matrix_and_ordinate(currents, grid)
+        
+        
+        self.assertEqual(eq_matrix, B)
+        self.assertEqual(sum(ordinate), sum(b))
+    
     def test_lsystem_to_matrix_and_ordinate(self):
         '''Should make a corresponding matrix from linear equations'''
         A = sympy.Matrix([[1,1,1], [1,0,2], [1,11,3]])
