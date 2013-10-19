@@ -37,7 +37,7 @@ def execute_fill(matrix_dimension, P, verbose=False, silent = False, fast = True
 
     def choose_conductivity():
         """Uses given probability to simulate different concentrations of metallic particles"""
-        return 1 if rnd.random() < P else 1e-5
+        return 4 if rnd.random() < P else 1
     
     def choose_emf(node_from, node_to):
         """Places a battery only in vertical wires"""

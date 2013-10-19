@@ -28,79 +28,80 @@ class Equationeer(object):
         """A very, very, very ugly piece of code based on operations in methods cirquit_ and node_equations"""
         B = []
         b = [0 for _ in range(len(variables))]
+        vardict = dict(zip(variables, range(len(variables))))
         
         i=0
         for node in grid.nodes[:-1]:
             B.append([0 for _ in range(len(variables))])
-            j1 = variables.index(grid.get_wires_to_node(node)[0].current)
+            j1 = vardict[grid.get_wires_to_node(node)[0].current]
             B[i][j1] = 1
-            
-            j2 = variables.index(grid.get_wires_to_node(node)[1].current)
+             
+            j2 = vardict[grid.get_wires_to_node(node)[1].current]
             B[i][j2] = 1
-            
-            j3 = variables.index(grid.get_wires_from_node(node)[0].current)
+             
+            j3 = vardict[grid.get_wires_from_node(node)[0].current]
             B[i][j3] = -1
-            
-            j4 = variables.index(grid.get_wires_from_node(node)[1].current)
+             
+            j4 = vardict[grid.get_wires_from_node(node)[1].current]
             B[i][j4] = -1
-            
+             
             i+=1
             B.append([0 for _ in range(len(variables))])
-            
+             
             first_wire = grid.get_wires_from_node(node)[1]
             second_node = first_wire.node_to
             second_wire = grid.get_wires_from_node(second_node)[0]
             third_node = second_wire.node_to
             third_wire = grid.get_wires_to_node(third_node)[1]
             fourth_wire = grid.get_wires_from_node(node)[0] 
-            
-            j1 = variables.index(first_wire.current)
+             
+            j1 = vardict[first_wire.current]
             B[i][j1] = 1/first_wire.conductivity
-            
-            j2 = variables.index(second_wire.current)
+             
+            j2 = vardict[second_wire.current]
             B[i][j2] = 1/second_wire.conductivity
-            
-            j3 = variables.index(third_wire.current)
+             
+            j3 = vardict[third_wire.current]
             B[i][j3] = -1/third_wire.conductivity
-            
-            j4 = variables.index(fourth_wire.current)
+             
+            j4 = vardict[fourth_wire.current]
             B[i][j4] = -1/fourth_wire.conductivity
-            
+             
             i+=1
-            
+             
         N = int(math.sqrt(len(grid.nodes)))
         node_iter = grid.nodes[0]
         bi = 0
         B.append([0 for _ in range(len(variables))])
         for _ in range(0, N):
-            
+             
             wire_iter = grid.get_wires_from_node(node_iter)[1]
-            
-            j1 = variables.index(wire_iter.current)
+             
+            j1 = vardict[wire_iter.current]
             B[i][j1] = 1/wire_iter.conductivity
-            
+             
             bi += wire_iter.emf
             node_iter = wire_iter.node_to
-            
+             
         b[i] = bi
-        
+         
         i+=1
         bi=0
         node_iter = grid.nodes[0]
-        
+         
         B.append([0 for _ in range(len(variables))])
         for _ in range(0, N):
             wire_iter = grid.get_wires_from_node(node_iter)[0]
-            
-            j1 = variables.index(wire_iter.current)
+             
+            j1 = vardict[wire_iter.current]
             B[i][j1] = 1/wire_iter.conductivity
-            
+             
             bi += wire_iter.emf
             node_iter = wire_iter.node_to
-            
+             
         b[i] = bi
         return B, b
-      
+       
     def node_equations(self, grid):
         for node in grid.nodes[:-1]:
             yield (grid.get_wires_to_node(node)[0].current
