@@ -3,8 +3,7 @@ Created on 15 окт. 2013 г.
 
 @author: vdrhtc
 '''
-import unittest, sympy
-from sympy import Matrix
+import unittest, sympy, numpy
 from conductivity.simulation.equationeer import Equationeer
 from conductivity.simulation.grid_fill_and_solve import execute_fill
 
@@ -13,12 +12,14 @@ class Test(unittest.TestCase):
 
     def test_create_equation_matrix_and_ordinate(self):
         '''Should make a corresponding matrix from grid'''
-        grid, equations, currents, eq_matrix, ordinate = execute_fill(10, 0.8, silent=True, fast=False)
+        grid, equations, currents, eq_matrix, ordinate = execute_fill(5, 0.6, silent=True, fast=False)
         B, b = Equationeer().create_equation_matrix_and_ordinate(currents, grid)
         
+        x1 = numpy.linalg.solve(B, b)
+        x2 = numpy.linalg.solve(eq_matrix, ordinate)
+        self.assertAlmostEqual((x1-x2).sum(), 0)
         
-        #self.assertEqual(eq_matrix, B)
-        self.assertEqual(sum(ordinate), sum(b))
+        
     
     def test_lsystem_to_matrix_and_ordinate(self):
         '''Should make a corresponding matrix from linear equations'''
@@ -31,7 +32,7 @@ class Test(unittest.TestCase):
                      vars_list[0]+11*vars_list[1]+3*vars_list[2]]
         
         B, b = Equationeer().lsystem_to_matrix_and_ordinate(equations, vars_list)
-        print(B)
+        #print(B)
         self.assertEqual(A, B)
         self.assertEqual(a, b)
 
