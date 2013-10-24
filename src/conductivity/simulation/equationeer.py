@@ -4,6 +4,7 @@ Created on 15 окт. 2013 г.
 @author: vdrhtc
 '''
 import sympy, math
+from numpy import *
 
 
 class Equationeer(object):
@@ -25,14 +26,15 @@ class Equationeer(object):
     
     
     def create_equation_matrix_and_ordinate(self, variables, grid):
+
         """A very, very, very ugly (but fast) piece of code based on operations in methods cirquit_ and node_equations"""
-        B = []
-        b = [0 for _ in range(len(variables))]
+       
+        B = zeros((len(variables),len(variables)))
+        b = zeros(len(variables))
         vardict = dict(zip(variables, range(len(variables))))
         
         i=0
         for node in grid.nodes[:-1]:
-            B.append([0 for _ in range(len(variables))])
             j1 = vardict[grid.get_wires_to_node(node)[0].current]
             B[i][j1] = 1
              
@@ -46,7 +48,6 @@ class Equationeer(object):
             B[i][j4] = -1
              
             i+=1
-            B.append([0 for _ in range(len(variables))])
              
             first_wire = grid.get_wires_from_node(node)[1]
             second_node = first_wire.node_to
@@ -72,7 +73,6 @@ class Equationeer(object):
         N = int(math.sqrt(len(grid.nodes)))
         node_iter = grid.nodes[0]
         bi = 0
-        B.append([0 for _ in range(len(variables))])
         for _ in range(0, N):
              
             wire_iter = grid.get_wires_from_node(node_iter)[1]
@@ -89,7 +89,6 @@ class Equationeer(object):
         bi=0
         node_iter = grid.nodes[0]
          
-        B.append([0 for _ in range(len(variables))])
         for _ in range(0, N):
             wire_iter = grid.get_wires_from_node(node_iter)[0]
              

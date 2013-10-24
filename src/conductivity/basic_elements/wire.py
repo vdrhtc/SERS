@@ -3,13 +3,15 @@ Created on 08 окт. 2013 г.
 
 @author: gleb
 '''
+import conductivity.basic_elements.grid, math
+from conductivity.basic_elements import grid
 
 class Wire(object):
     '''
     Represents wire object with arbitrary conductivity
     '''
     
-    def __init__(self, conductivity = 1, emf = 0, node_from = None, node_to = None, current=0):
+    def __init__(self, grid, conductivity = 1, emf = 0, node_from = None, node_to = None, current=0):
         '''
         Constructor
         '''
@@ -18,6 +20,7 @@ class Wire(object):
         self.node_from = node_from
         self.node_to = node_to
         self.current = current
+        self.horizontal = True if abs(node_from.id - node_to.id)<math.sqrt(len(grid.nodes)) else False
         
         
     def __repr__(self):
