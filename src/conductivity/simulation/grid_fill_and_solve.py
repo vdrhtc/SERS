@@ -8,7 +8,7 @@ from conductivity.basic_elements.grid import Grid
 from conductivity.basic_elements.wire import Wire
 from conductivity.basic_elements.node import Node
 from conductivity.simulation.equationeer import Equationeer as eq
-import sys, sympy, numpy, time, scipy.sparse.linalg as ssl
+import sys, sympy, numpy, time, scipy.sparse.linalg as ssl, scipy.sparse as ss
 import random as rnd
 
 
@@ -17,7 +17,7 @@ def solve(equations, variables, eq_matrix, ordinate, symbolic=False):
     Solves symbolically or numerically given equations
     """
     if not symbolic:
-        solution = ssl.spsolve(eq_matrix, ordinate) 
+        solution = ssl.spsolve(ss.csr_matrix(eq_matrix), ordinate) 
         solution = dict(zip(variables, solution))
         return [solution, variables, sum(solution.values())]
     else:
