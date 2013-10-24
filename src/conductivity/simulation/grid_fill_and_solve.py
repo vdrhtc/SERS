@@ -8,7 +8,7 @@ from conductivity.basic_elements.grid import Grid
 from conductivity.basic_elements.wire import Wire
 from conductivity.basic_elements.node import Node
 from conductivity.simulation.equationeer import Equationeer as eq
-import sys, sympy, numpy, time
+import sys, sympy, numpy, time, scipy.sparse.linalg as ssl
 import random as rnd
 
 
@@ -17,14 +17,14 @@ def solve(equations, variables, eq_matrix, ordinate, symbolic=False):
     Solves symbolically or numerically given equations
     """
     if not symbolic:
-        solution = numpy.linalg.solve(eq_matrix, ordinate) 
+        solution = ssl.spsolve(eq_matrix, ordinate) 
         solution = dict(zip(variables, solution))
         return [solution, variables, sum(solution.values())]
     else:
         solution = sympy.solve(equations)
         return [solution, variables, sum(solution.values())]
     
-def execute_fill(matrix_dimension, P, verbose=False, silent = False, fast = True, sm = 1, sd = 1e-5):
+def execute_fill(matrix_dimension, P, verbose=False, silent = False, fast = True, sm = 9, sd = 1):
     """
     Fills the grid, builds equations to calculate currents and 
     returns the grid, symbolic equations, variables and the numerical representation of the equations
@@ -90,7 +90,5 @@ def execute_fill(matrix_dimension, P, verbose=False, silent = False, fast = True
         
     
 if __name__ == '__main__':
-    start = time.clock()
     grid, equations, currents, eq_matrix, ordinate = execute_fill(int(sys.argv[1]), float(sys.argv[2]), False, fast=True)
     print("The sum of currents is: ", (solve(equations, currents, eq_matrix, ordinate, False))[-1])
-    print(time.clock()-start)
