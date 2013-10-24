@@ -25,7 +25,7 @@ class Equationeer(object):
     
     
     def create_equation_matrix_and_ordinate(self, variables, grid):
-        """A very, very, very ugly piece of code based on operations in methods cirquit_ and node_equations"""
+        """A very, very, very ugly (but fast) piece of code based on operations in methods cirquit_ and node_equations"""
         B = []
         b = [0 for _ in range(len(variables))]
         vardict = dict(zip(variables, range(len(variables))))
