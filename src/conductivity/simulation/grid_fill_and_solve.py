@@ -8,7 +8,7 @@ from conductivity.basic_elements.grid import Grid
 from conductivity.basic_elements.wire import Wire
 from conductivity.basic_elements.node import Node
 from conductivity.simulation.equationeer import Equationeer as eq
-import sys, sympy, numpy
+import sys, sympy, numpy, time
 import random as rnd
 
 
@@ -80,5 +80,7 @@ def execute_fill(matrix_dimension, P, verbose=False, silent = False, fast = True
         
     
 if __name__ == '__main__':
+    start = time.clock()
     grid, equations, currents, eq_matrix, ordinate = execute_fill(int(sys.argv[1]), float(sys.argv[2]), False, fast=True)
     print("The sum of currents is: ", (solve(equations, currents, eq_matrix, ordinate, False))[-1])
+    print(time.clock()-start)
