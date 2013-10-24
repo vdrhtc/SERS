@@ -46,13 +46,23 @@ def execute_fill(matrix_dimension, P, verbose=False, silent = False, fast = True
    
     grid.nodes = [Node(number_id) for number_id in range(0, matrix_dimension ** 2)]
     
-    grid.wires = [Wire(choose_conductivity(sm, sd),
-                       choose_emf(node_from, node_to), 
+    i=0
+    for node_from in grid.nodes:
+        for node_to_id in grid.neighborhood_nodes2(node_from):
+            wire = Wire(grid, choose_conductivity(sm, sd),
+                       choose_emf(node_from, grid.nodes[node_to_id]), 
                        node_from, 
-                       node_to,
+                       grid.nodes[node_to_id],
                        next(currents_iter))
-                       for node_from in grid.nodes
-                       for node_to in grid.neighborhood_nodes(node_from)]
+            grid.wires.append(wire)
+            if wire.horizontal: 
+                grid.nodes[i].wires_from[0] = wire
+                grid.nodes[node_to_id].wires_to[0] = wire
+            else: 
+                grid.nodes[i].wires_from[1] = wire           
+                grid.nodes[node_to_id].wires_to[1] = wire
+        i+=1
+            
      
     if verbose:
         for wire in grid.wires:
