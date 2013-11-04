@@ -15,10 +15,10 @@ class Grid(object):
         '''
         Constructor
         '''
+        self.nodes = []
+        self.wires = []
         
         
-    nodes = []
-    wires = []
     
     def draw(self):
         N = int(math.sqrt(len(self.nodes)))

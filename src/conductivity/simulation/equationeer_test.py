@@ -4,6 +4,7 @@ Created on 15 окт. 2013 г.
 @author: vdrhtc
 '''
 import unittest, sympy, numpy
+from scipy.sparse import linalg 
 from conductivity.simulation.equationeer import Equationeer
 from conductivity.simulation.grid_fill_and_solve import execute_fill
 
@@ -19,7 +20,16 @@ class Test(unittest.TestCase):
         x2 = numpy.linalg.solve(eq_matrix, ordinate)
         self.assertAlmostEqual((x1-x2).sum(), 0)
         
+    def test_create_equation_matrix_and_ordinate_low_memory(self):
+        '''Should make a corresponding low-memory matrix from grid'''
+        grid, equations, currents, eq_matrix, ordinate = execute_fill(10, 0.6, silent=True, fast=False)
+        B, b = Equationeer().create_equation_matrix_and_ordinate_low_memory(currents, grid)
+
+        x1 = linalg.spsolve(B, b)
+        x2 = numpy.linalg.solve(eq_matrix, ordinate)
         
+        self.assertAlmostEqual((x1-x2).sum(), 0)
+
     
     def test_lsystem_to_matrix_and_ordinate(self):
         '''Should make a corresponding matrix from linear equations'''
