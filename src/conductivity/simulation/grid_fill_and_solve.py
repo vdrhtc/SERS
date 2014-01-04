@@ -27,7 +27,7 @@ def solve(equations, variables, eq_matrix, ordinate, symbolic=False):
         solution = sympy.solve(equations)
         return [solution, variables, sum(solution.values())]
     
-def execute_fill(matrix_dimension, P, verbose=False, silent=False, fast=True, sm=1, sd=1e-5):
+def execute_fill(matrix_dimension, P, verbose=False, silent=False, fast=True, sm=100, sd=1):
     """
     Fills the grid, builds equations to calculate currents and 
     returns the grid, symbolic equations, variables and the numerical representation of the equations
@@ -95,4 +95,5 @@ def execute_fill(matrix_dimension, P, verbose=False, silent=False, fast=True, sm
     
 if __name__ == '__main__':
     grid, equations, currents, eq_matrix, ordinate = execute_fill(int(sys.argv[1]), float(sys.argv[2]), False, fast=True)
-    print("The sum of currents is: ", (solve(equations, currents, eq_matrix, ordinate, False))[-1])
+    print("The sum of currents is: ", (solve(equations, currents, eq_matrix, ordinate, False))[-1])    
+    print("The conductivity is: ", (solve(equations, currents, eq_matrix, ordinate, False))[-1]/len(currents)*2)
