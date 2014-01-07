@@ -69,7 +69,7 @@ def execute_fill(matrix_dimension, P, verbose=False, silent=False, fast=True, fr
 
     def choose_conductivity(em, ed):
         """Uses given probability to simulate different concentrations of metallic particles"""
-        return em if rnd.random() < P else ed
+        return (em, True) if rnd.random() < P else (ed, False)
     
     def choose_emf(node_from, node_to):
         """Places a battery only in vertical wires"""
@@ -82,7 +82,8 @@ def execute_fill(matrix_dimension, P, verbose=False, silent=False, fast=True, fr
     i = 0
     for node_from in grid.nodes:
         for node_to_id in grid.neighborhood_nodes2(node_from):
-            wire = Wire(grid, choose_conductivity(em, ed),
+            conductivity, conductor = choose_conductivity(em, ed)
+            wire = Wire(grid, conductivity, conductor, 
                        choose_emf(node_from, grid.nodes[node_to_id]),
                        node_from,
                        grid.nodes[node_to_id],
