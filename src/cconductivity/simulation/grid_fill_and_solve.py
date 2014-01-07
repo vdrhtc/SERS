@@ -34,7 +34,12 @@ def calculate_em(frequency):
     e_b = 5
     omega_p = 9.1
     omega_tau = 0.02
-    return e_b-(omega_p/frequency)**2/(1+(omega_tau/frequency)*J)
+    return e_b - (omega_p / frequency) ** 2 / (1 + (omega_tau / frequency) * J)
+
+def calculate_sm(frequency):
+    j = 1j 
+    return -j * frequency * calculate_em(frequency) / 4 / scipy.pi
+
    
     
 def change_frequency(old_grid, frequency):
@@ -44,29 +49,10 @@ def change_frequency(old_grid, frequency):
             wire.conductivity = em
     
     
+def generate_grid(matrix_dimension, P,  frequency=1.02, ed=1):    
     
-    
-def execute_fill(matrix_dimension, P, verbose=False, silent=False, fast=True, frequency=1.02, ed=1):
-    """
-    Fills the grid, builds equations to calculate currents and 
-    returns the grid, symbolic equations, variables and the numerical representation of the equations
-    """
     grid = Grid()
-
-    currents_gen = sympy.numbered_symbols('I')
-    currents = [next(currents_gen) for _ in range(0, 2 * matrix_dimension ** 2)]
-    currents_iter = iter(currents)
     
-    
-    
-    def calculate_sm(frequency):
-        j=1j 
-        return -j*frequency*calculate_em(frequency)/4/scipy.pi
-
-    em = calculate_em(frequency)
-    print(em)
-
-
     def choose_conductivity(em, ed):
         """Uses given probability to simulate different concentrations of metallic particles"""
         return (em, True) if rnd.random() < P else (ed, False)
@@ -75,7 +61,18 @@ def execute_fill(matrix_dimension, P, verbose=False, silent=False, fast=True, fr
         """Places a battery only in vertical wires"""
         return 0 if abs(node_from.id - node_to.id) < matrix_dimension else 1
     
+    
+    em = calculate_em(frequency)
+    print(em)
+
    
+
+    currents_gen = sympy.numbered_symbols('I')
+    currents = [next(currents_gen) for _ in range(0, 2 * matrix_dimension ** 2)]
+    currents_iter = iter(currents) 
+    
+    
+    
     grid.nodes = [Node(number_id) for number_id in range(0, matrix_dimension ** 2)]
     
     
@@ -83,7 +80,7 @@ def execute_fill(matrix_dimension, P, verbose=False, silent=False, fast=True, fr
     for node_from in grid.nodes:
         for node_to_id in grid.neighborhood_nodes2(node_from):
             conductivity, conductor = choose_conductivity(em, ed)
-            wire = Wire(grid, conductivity, conductor, 
+            wire = Wire(grid, conductivity, conductor,
                        choose_emf(node_from, grid.nodes[node_to_id]),
                        node_from,
                        grid.nodes[node_to_id],
@@ -96,20 +93,23 @@ def execute_fill(matrix_dimension, P, verbose=False, silent=False, fast=True, fr
                 grid.nodes[i].wires_from[1] = wire           
                 grid.nodes[node_to_id].wires_to[1] = wire
         i += 1
-            
+    
+    grid.dimension = matrix_dimension
+    return grid, currents
+
+    
+def create_equations(matrix_dimension, P, verbose=False, silent=False, fast=True, frequency=1.02, ed=1):
+    """
+    Fills the grid, builds equations to calculate currents and 
+    returns the grid, symbolic equations, variables and the numerical representation of the equations
+    """
+    grid, currents = generate_grid(matrix_dimension, P, frequency, ed)
      
-    if verbose:
-        for wire in grid.wires:
-            print(wire)
-             
-    if not silent:    
-        print(len(grid.wires))
-        if matrix_dimension < 15:
-            grid.draw()
+    print_grid_info(verbose, silent, grid)
      
     if not fast:    
         equations1 = list(eq().circuit_equations(grid))
-        if verbose: print(equations1)
+        if verbose: print(repr(equations1))
         
         equations2 = list(eq().node_equations(grid))
         if verbose: print(equations2)
@@ -123,7 +123,17 @@ def execute_fill(matrix_dimension, P, verbose=False, silent=False, fast=True, fr
 
     return grid, equations, currents, eq_matrix, ordinate
         
+        
+def print_grid_info(verbose, silent, grid):
+    if verbose:
+        for wire in grid.wires:
+            print(wire)
+             
+    if not silent:    
+        print(len(grid.wires))
+        if grid.dimension < 15:
+            grid.draw()
     
 if __name__ == '__main__':
-    grid, equations, currents, eq_matrix, ordinate = execute_fill(int(sys.argv[1]), float(sys.argv[2]), True, fast=False)
-    print("The conductivity is: ", (solve(equations, currents, eq_matrix, ordinate, True))[-1]/len(currents)*2)
+    grid, equations, currents, eq_matrix, ordinate = create_equations(int(sys.argv[1]), float(sys.argv[2]), False, fast=True)
+    print("The conductivity is: ", (solve(equations, currents, eq_matrix, ordinate, False))[-1] / len(currents) * 2)

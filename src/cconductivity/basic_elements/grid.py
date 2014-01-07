@@ -17,6 +17,7 @@ class Grid(object):
         '''
         self.nodes = []
         self.wires = []
+        self.dimension = 0
         
         
     

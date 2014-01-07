@@ -5,15 +5,15 @@ Created on 15 окт. 2013 г.
 '''
 import unittest, sympy, numpy
 from scipy.sparse import linalg 
-from conductivity.simulation.equationeer import Equationeer
-from conductivity.simulation.grid_fill_and_solve import execute_fill
+from cconductivity.simulation.equationeer import Equationeer
+from cconductivity.simulation.grid_fill_and_solve import create_equations
 
 
 class Test(unittest.TestCase):
 
     def test_create_equation_matrix_and_ordinate(self):
         '''Should make a corresponding matrix from grid'''
-        grid, equations, currents, eq_matrix, ordinate = execute_fill(5, 0.6, silent=True, fast=False)
+        grid, equations, currents, eq_matrix, ordinate = create_equations(5, 0.6, silent=True, fast=False)
         B, b = Equationeer().create_equation_matrix_and_ordinate(currents, grid)
         
         x1 = numpy.linalg.solve(B, b)
@@ -22,7 +22,7 @@ class Test(unittest.TestCase):
         
     def test_create_equation_matrix_and_ordinate_low_memory(self):
         '''Should make a corresponding low-memory matrix from grid'''
-        grid, equations, currents, eq_matrix, ordinate = execute_fill(10, 0.6, silent=True, fast=False)
+        grid, equations, currents, eq_matrix, ordinate = create_equations(10, 0.6, silent=True, fast=False)
         B, b = Equationeer().create_equation_matrix_and_ordinate_low_memory(currents, grid)
 
         x1 = linalg.spsolve(B, b)

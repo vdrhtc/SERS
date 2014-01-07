@@ -65,7 +65,10 @@ class Equationeer(object):
              
             j4 = vardict[fourth_wire.current]
             B[i, j4] = -1 / fourth_wire.conductivity
-             
+            
+            b[0, i] = - first_wire.emf - second_wire.emf + third_wire.emf + fourth_wire.emf
+            
+            
             i += 1
              
         N = int(math.sqrt(len(grid.nodes)))

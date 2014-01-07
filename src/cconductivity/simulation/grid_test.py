@@ -11,7 +11,7 @@ class Test(unittest.TestCase):
 
 
     def test_nodes_from_and_to_2(self):
-        grid, equations, currents, eq_matrix, ordinate = grid_fill_and_solve.execute_fill(10, 0.5, False, True, True)
+        grid, equations, currents, eq_matrix, ordinate = grid_fill_and_solve.create_equations(10, 0.5, False, True, True)
 #         print(tuple(grid.get_wires_to_node(grid.nodes[2])), 
 #                          (tuple(grid.get_wires_to_node2(grid.nodes[2]))))
        
