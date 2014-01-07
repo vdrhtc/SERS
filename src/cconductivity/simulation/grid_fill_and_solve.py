@@ -5,11 +5,12 @@ Created on 09 окт. 2013 г.
 '''
 
 
-from conductivity.basic_elements.grid import Grid
-from conductivity.basic_elements.node import Node
-from conductivity.basic_elements.wire import Wire
-from conductivity.simulation.equationeer import Equationeer as eq
+from cconductivity.basic_elements.grid import Grid
+from cconductivity.basic_elements.node import Node
+from cconductivity.basic_elements.wire import Wire
+from cconductivity.simulation.equationeer import Equationeer as eq
 import random as rnd
+import scipy
 import scipy.sparse as ss
 import scipy.sparse.linalg as ssl
 import sympy
@@ -22,12 +23,30 @@ def solve(equations, variables, eq_matrix, ordinate, symbolic=False):
     if not symbolic:
         solution = ssl.spsolve(ss.csr_matrix(eq_matrix), ordinate) 
         solution = dict(zip(variables, solution))
-        return [solution, variables, sum(solution.values())]
+        return [solution, sum(solution.values())]
     else:
         solution = sympy.solve(equations)
         return [solution, variables, sum(solution.values())]
     
-def execute_fill(matrix_dimension, P, verbose=False, silent=False, fast=True, sm=100, sd=1):
+
+def calculate_em(frequency):
+    J = 1J
+    e_b = 5
+    omega_p = 9.1
+    omega_tau = 0.02
+    return e_b-(omega_p/frequency)**2/(1+(omega_tau/frequency)*J)
+   
+    
+def change_frequency(old_grid, frequency):
+    em = calculate_em(frequency)
+    for wire in old_grid.wires:
+        if wire.conductivity != 1:
+            wire.conductivity = em
+    
+    
+    
+    
+def execute_fill(matrix_dimension, P, verbose=False, silent=False, fast=True, frequency=1.02, ed=1):
     """
     Fills the grid, builds equations to calculate currents and 
     returns the grid, symbolic equations, variables and the numerical representation of the equations
@@ -37,10 +56,20 @@ def execute_fill(matrix_dimension, P, verbose=False, silent=False, fast=True, sm
     currents_gen = sympy.numbered_symbols('I')
     currents = [next(currents_gen) for _ in range(0, 2 * matrix_dimension ** 2)]
     currents_iter = iter(currents)
+    
+    
+    
+    def calculate_sm(frequency):
+        j=1j 
+        return -j*frequency*calculate_em(frequency)/4/scipy.pi
 
-    def choose_conductivity(sm, sd):
+    em = calculate_em(frequency)
+    print(em)
+
+
+    def choose_conductivity(em, ed):
         """Uses given probability to simulate different concentrations of metallic particles"""
-        return sm if rnd.random() < P else sd
+        return em if rnd.random() < P else ed
     
     def choose_emf(node_from, node_to):
         """Places a battery only in vertical wires"""
@@ -49,10 +78,11 @@ def execute_fill(matrix_dimension, P, verbose=False, silent=False, fast=True, sm
    
     grid.nodes = [Node(number_id) for number_id in range(0, matrix_dimension ** 2)]
     
+    
     i = 0
     for node_from in grid.nodes:
         for node_to_id in grid.neighborhood_nodes2(node_from):
-            wire = Wire(grid, choose_conductivity(sm, sd),
+            wire = Wire(grid, choose_conductivity(em, ed),
                        choose_emf(node_from, grid.nodes[node_to_id]),
                        node_from,
                        grid.nodes[node_to_id],

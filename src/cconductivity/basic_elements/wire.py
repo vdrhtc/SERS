@@ -3,8 +3,8 @@ Created on 08 окт. 2013 г.
 
 @author: gleb
 '''
-import conductivity.basic_elements.grid, math
-from conductivity.basic_elements import grid
+import cconductivity.basic_elements.grid, math
+from cconductivity.basic_elements import grid
 
 class Wire(object):
     '''
@@ -28,7 +28,7 @@ class Wire(object):
     
     def draw(self, grid_size):
         if abs(self.node_from.id - self.node_to.id) < grid_size:
-            print("---", end = '') if self.conductivity == 1 else print("   ", end = '')
+            print("---", end = '') if self.conductivity != 1 else print("   ", end = '')
         else:
-            print("V", end = '') if self.conductivity == 1 else print(" ", end = '')
+            print("V", end = '') if self.conductivity != 1 else print(" ", end = '')
             
