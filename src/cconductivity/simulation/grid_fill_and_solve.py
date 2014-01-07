@@ -41,6 +41,15 @@ def calculate_sm(frequency):
     return -j * frequency * calculate_em(frequency) / 4 / scipy.pi
 
    
+
+def change_emfs(old_grid, new_emfs):
+    """
+    Takes an old grid and replaces old emfs with ones from the new_emfs array (2n^2 x 1) 
+    """
+    for new_emf in new_emfs:
+        next(iter(grid.wires)).emf = new_emf
+    
+
     
 def change_frequency(old_grid, frequency):
     em = calculate_em(frequency)
