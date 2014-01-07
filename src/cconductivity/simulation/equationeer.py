@@ -27,7 +27,7 @@ class Equationeer(object):
     
     def create_equation_matrix_and_ordinate_low_memory(self, variables, grid):
         B = sparse.lil_matrix((len(variables), len(variables)), dtype = complex)
-        b = sparse.lil_matrix((1, len(variables)))
+        b = sparse.lil_matrix((1, len(variables)), dtype = complex)
         vardict = dict(zip(variables, range(len(variables))))
         
         

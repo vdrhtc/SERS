@@ -25,7 +25,7 @@ class Wire(object):
         
         
     def __repr__(self):
-        return "<Class: Wire, conductivity = " + str(self.conductivity)+ ", conductor = " + str(self.conductor) + ", current = " + str(self.current) + ", (From, To) = " + str(( self.node_from, self.node_to)) + ">"
+        return "<Class: Wire, conductivity = " + str(self.conductivity)+ ", conductor = " + str(self.conductor) + ", EMF = " + str(self.emf)+", current = " + str(self.current) + ", (From, To) = " + str(( self.node_from, self.node_to)) + ">"
     
     def draw(self):
         if self.horizontal:
