@@ -25,10 +25,10 @@ class Grid(object):
         for row in [self.nodes[i:(i + N)] for i in range(0, N ** 2, N)]:
             for node in row:
                 node.draw()
-                self.get_wires_from_node(node)[0].draw(N)
+                self.get_wires_from_node(node)[0].draw()
             print("")
             for node in row:
-                self.get_wires_from_node(node)[1].draw(N)
+                self.get_wires_from_node(node)[1].draw()
                 print("   ", end='')
             print('')
                  
