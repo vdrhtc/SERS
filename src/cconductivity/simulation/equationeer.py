@@ -201,7 +201,9 @@ class Equationeer(object):
             yield (first_wire.current / first_wire.conductivity
                    + second_wire.current / second_wire.conductivity
                    - third_wire.current / third_wire.conductivity
-                   - fourth_wire.current / fourth_wire.conductivity)
+                   - fourth_wire.current / fourth_wire.conductivity
+                   + first_wire.emf + second_wire.emf
+                   - third_wire.emf - fourth_wire.emf)
         eq_vertical = 0
         N = int(math.sqrt(len(grid.nodes)))
         node_iter = grid.nodes[0]

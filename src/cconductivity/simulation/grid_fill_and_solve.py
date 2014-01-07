@@ -125,6 +125,5 @@ def execute_fill(matrix_dimension, P, verbose=False, silent=False, fast=True, fr
         
     
 if __name__ == '__main__':
-    grid, equations, currents, eq_matrix, ordinate = execute_fill(int(sys.argv[1]), float(sys.argv[2]), False, fast=True)
-    print("The sum of currents is: ", (solve(equations, currents, eq_matrix, ordinate, False))[-1])    
-    print("The conductivity is: ", (solve(equations, currents, eq_matrix, ordinate, False))[-1]/len(currents)*2)
+    grid, equations, currents, eq_matrix, ordinate = execute_fill(int(sys.argv[1]), float(sys.argv[2]), True, fast=False)
+    print("The conductivity is: ", (solve(equations, currents, eq_matrix, ordinate, True))[-1]/len(currents)*2)
