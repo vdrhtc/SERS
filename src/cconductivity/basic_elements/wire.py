@@ -29,7 +29,20 @@ class Wire(object):
     
     def draw(self):
         if self.horizontal:
-            print("---", end = '') if self.conductivity != 1 else print("   ", end = '')
+            if self.emf == 0:
+                print("---", end = '') if self.conductor else print("   ", end = '')
+            elif self.emf > 0:
+                print("->-", end = '') if self.conductor else print("   ", end = '')
+            else:
+                print("-<-", end = '') if self.conductor else print("   ", end = '')
+            
         else:
-            print("V", end = '') if self.conductivity != 1 else print(" ", end = '')
+            if self.emf == 0:
+                print("|", end = '') if self.conductor else print(" ", end = '')
+            elif self.emf > 0:
+                print("V", end = '') if self.conductor else print(" ", end = '')
+            else:
+                print("^", end = '') if self.conductor else print(" ", end = '')
+
+
             
